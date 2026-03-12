@@ -1,59 +1,55 @@
-import { headers as getHeaders } from 'next/headers.js'
-import Image from 'next/image'
-import { getPayload } from 'payload'
 import React from 'react'
-import { fileURLToPath } from 'url'
+import { getPayloadClient } from '@/lib/payload'
+import { HeroSection } from '@/components/sections/HeroSection'
+import { ServicesGrid } from '@/components/sections/ServicesGrid'
+import { StatsSection } from '@/components/sections/StatsSection'
+import { PartnersMarquee } from '@/components/sections/PartnersMarquee'
+import { BlogPreviewSection } from '@/components/sections/BlogPreviewSection'
+import { ContactCTA } from '@/components/sections/ContactCTA'
 
-import config from '@/payload.config'
-import './styles.css'
+export const revalidate = 3600
 
 export default async function HomePage() {
-  const headers = await getHeaders()
-  const payloadConfig = await config
-  const payload = await getPayload({ config: payloadConfig })
-  const { user } = await payload.auth({ headers })
+  let services: Parameters<typeof ServicesGrid>[0]['services'] = []
+  let posts: Parameters<typeof BlogPreviewSection>[0]['posts'] = []
+  let partners: Parameters<typeof PartnersMarquee>[0]['partners'] = []
+  let stats: Parameters<typeof StatsSection>[0]['stats'] = undefined
 
-  const fileURL = `vscode://file/${fileURLToPath(import.meta.url)}`
+  try {
+    const payload = await getPayloadClient()
+
+    const [servicesRes, postsRes, partnersRes, settingsRes] = await Promise.all([
+      payload.find({ collection: 'services', limit: 6, sort: 'order' }),
+      payload.find({
+        collection: 'posts',
+        limit: 3,
+        sort: '-publishedAt',
+        where: { status: { equals: 'published' } },
+      }),
+      payload.find({ collection: 'partners', limit: 20, sort: 'order' }),
+      payload.findGlobal({ slug: 'site-settings' }).catch(() => null),
+    ])
+
+    services = servicesRes.docs as Parameters<typeof ServicesGrid>[0]['services']
+    posts = postsRes.docs as Parameters<typeof BlogPreviewSection>[0]['posts']
+    partners = partnersRes.docs as Parameters<typeof PartnersMarquee>[0]['partners']
+
+    if (settingsRes) {
+      const s = settingsRes as { stats?: { value: string; label: string }[] }
+      stats = s.stats
+    }
+  } catch {
+    // DB not connected — use fallback data from components
+  }
 
   return (
-    <div className="home">
-      <div className="content">
-        <picture>
-          <source srcSet="https://raw.githubusercontent.com/payloadcms/payload/main/packages/ui/src/assets/payload-favicon.svg" />
-          <Image
-            alt="Payload Logo"
-            height={65}
-            src="https://raw.githubusercontent.com/payloadcms/payload/main/packages/ui/src/assets/payload-favicon.svg"
-            width={65}
-          />
-        </picture>
-        {!user && <h1>Welcome to your new project.</h1>}
-        {user && <h1>Welcome back, {user.email}</h1>}
-        <div className="links">
-          <a
-            className="admin"
-            href={payloadConfig.routes.admin}
-            rel="noopener noreferrer"
-            target="_blank"
-          >
-            Go to admin panel
-          </a>
-          <a
-            className="docs"
-            href="https://payloadcms.com/docs"
-            rel="noopener noreferrer"
-            target="_blank"
-          >
-            Documentation
-          </a>
-        </div>
-      </div>
-      <div className="footer">
-        <p>Update this page by editing</p>
-        <a className="codeLink" href={fileURL}>
-          <code>app/(frontend)/page.tsx</code>
-        </a>
-      </div>
-    </div>
+    <>
+      <HeroSection />
+      <StatsSection stats={stats} />
+      <PartnersMarquee partners={partners} />
+      <ServicesGrid services={services} />
+      <BlogPreviewSection posts={posts} />
+      <ContactCTA />
+    </>
   )
 }
