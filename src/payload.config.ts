@@ -19,7 +19,6 @@ const dirname = path.dirname(filename)
 export default buildConfig({
   admin: {
     user: Users.slug,
-    access: ({ req }) => req.user?.role === 'admin',
     importMap: {
       baseDir: path.resolve(dirname),
     },
