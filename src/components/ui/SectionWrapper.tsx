@@ -1,9 +1,7 @@
 'use client'
 
-import React from 'react'
-import { motion } from 'framer-motion'
-import { useInView } from 'framer-motion'
-import { useRef } from 'react'
+import React, { useRef } from 'react'
+import { motion, useInView } from 'framer-motion'
 
 interface SectionWrapperProps {
   children: React.ReactNode
@@ -18,9 +16,11 @@ export function SectionWrapper({ children, className = '', delay = 0 }: SectionW
   return (
     <motion.div
       ref={ref}
-      initial={{ opacity: 0, y: 40 }}
-      animate={isInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 40 }}
-      transition={{ duration: 0.6, ease: 'easeOut', delay }}
+      // No opacity:0 initial — content is always visible (SSR + before JS)
+      // Only animate translateY as a subtle enhancement
+      initial={{ y: 24 }}
+      animate={{ y: isInView ? 0 : 24 }}
+      transition={{ duration: 0.55, ease: 'easeOut', delay }}
       className={className}
     >
       {children}

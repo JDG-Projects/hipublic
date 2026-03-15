@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { Suspense } from 'react'
 import { Inter, Syne } from 'next/font/google'
 import { getUser } from '@/lib/auth'
 import { getCachedSiteSettings } from '@/lib/site-settings'
@@ -35,11 +35,30 @@ export const metadata = {
   },
 }
 
+async function NavbarServer() {
+  const user = await getUser().catch(() => null)
+  return (
+    <Navbar
+      user={
+        user
+          ? {
+              email: user.email ?? '',
+              firstName: (user as { firstName?: string }).firstName,
+            }
+          : null
+      }
+    />
+  )
+}
+
+function NavbarFallback() {
+  return (
+    <header className="fixed top-0 left-0 right-0 z-50 h-16 border-b border-white/5 bg-[#07070f]/80 backdrop-blur-xl" />
+  )
+}
+
 export default async function FrontendLayout({ children }: { children: React.ReactNode }) {
-  const [user, settings] = await Promise.all([
-    getUser().catch(() => null),
-    getCachedSiteSettings(),
-  ])
+  const settings = await getCachedSiteSettings()
 
   return (
     <html lang="en" className={`${inter.variable} ${syne.variable}`}>
@@ -48,16 +67,9 @@ export default async function FrontendLayout({ children }: { children: React.Rea
         <link rel="icon" href="/favicon.ico" sizes="any" />
       </head>
       <body className="flex flex-col min-h-screen">
-        <Navbar
-          user={
-            user
-              ? {
-                  email: user.email ?? '',
-                  firstName: (user as { firstName?: string }).firstName,
-                }
-              : null
-          }
-        />
+        <Suspense fallback={<NavbarFallback />}>
+          <NavbarServer />
+        </Suspense>
         <main>{children}</main>
         <Footer socialLinks={settings?.socialLinks} />
       </body>

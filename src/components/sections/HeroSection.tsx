@@ -39,24 +39,14 @@ export function HeroSection() {
           Global Influencer Marketing Agency
         </motion.div>
 
-        {/* Headline */}
+        {/* Headline — no opacity:0 to avoid LCP delay */}
         <div className="mb-6">
-          <motion.h1
-            initial={{ opacity: 0, y: 30 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.7, delay: 0.2, ease: 'easeOut' }}
-            className="text-5xl sm:text-6xl md:text-7xl lg:text-8xl font-black tracking-tight leading-none mb-2"
-          >
+          <h1 className="text-5xl sm:text-6xl md:text-7xl lg:text-8xl font-black tracking-tight leading-none mb-2">
             FROM NOW
-          </motion.h1>
-          <motion.h1
-            initial={{ opacity: 0, y: 30 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.7, delay: 0.35, ease: 'easeOut' }}
-            className="text-5xl sm:text-6xl md:text-7xl lg:text-8xl font-black tracking-tight leading-none"
-          >
+          </h1>
+          <h1 className="text-5xl sm:text-6xl md:text-7xl lg:text-8xl font-black tracking-tight leading-none">
             TO <GradientText>WOW</GradientText>
-          </motion.h1>
+          </h1>
         </div>
 
         {/* Subtitle */}
