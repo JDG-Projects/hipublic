@@ -58,7 +58,7 @@ async function FooterServer() {
 
 function NavbarFallback() {
   return (
-    <header className="fixed top-0 left-0 right-0 z-50 h-16 border-b border-white/5 bg-[#07070f]/80 backdrop-blur-xl">
+    <header className="fixed top-0 left-0 right-0 z-50 h-16 border-b border-white/5 bg-bg/80 backdrop-blur-xl">
       <div className="absolute top-0 left-0 right-0 h-px bg-linear-to-r from-transparent via-purple-500/60 to-transparent" />
     </header>
   )

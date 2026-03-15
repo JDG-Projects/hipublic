@@ -1,3 +1,4 @@
+import Image from 'next/image'
 import React from 'react'
 
 interface Partner {
@@ -23,7 +24,7 @@ const fallbackPartners: Partner[] = [
 ]
 
 export function PartnersMarquee({ partners }: PartnersMarqueeProps) {
-  const items = (partners && partners.length > 0 ? partners : fallbackPartners)
+  const items = partners && partners.length > 0 ? partners : fallbackPartners
   const doubled = [...items, ...items] // for seamless loop
 
   return (
@@ -34,21 +35,21 @@ export function PartnersMarquee({ partners }: PartnersMarqueeProps) {
 
       <div className="relative">
         {/* Fade edges */}
-        <div className="absolute left-0 top-0 bottom-0 w-24 bg-linear-to-r from-[#07070f] to-transparent z-10 pointer-events-none" />
-        <div className="absolute right-0 top-0 bottom-0 w-24 bg-linear-to-l from-[#07070f] to-transparent z-10 pointer-events-none" />
+        <div className="absolute left-0 top-0 bottom-0 w-24 bg-linear-to-r from-bg to-transparent z-10 pointer-events-none" />
+        <div className="absolute right-0 top-0 bottom-0 w-24 bg-linear-to-l from-bg to-transparent z-10 pointer-events-none" />
 
         <div className="overflow-hidden">
           <div className="flex marquee-track" style={{ width: 'max-content' }}>
             {doubled.map((partner, i) => (
               <div
                 key={`${partner.id}-${i}`}
-                className="flex items-center justify-center mx-8 min-w-[140px] h-14 px-6 rounded-xl bg-white/3 border border-white/6 hover:border-white/15 transition-all duration-300 group"
+                className="flex items-center justify-center mx-8 min-w-35 h-14 px-6 rounded-xl bg-white/3 border border-white/6 hover:border-white/15 transition-all duration-300 group"
               >
                 {partner.logo?.url ? (
-                  <img
+                  <Image
                     src={partner.logo.url}
                     alt={partner.name}
-                    className="max-h-8 max-w-[110px] object-contain filter grayscale group-hover:grayscale-0 opacity-50 group-hover:opacity-90 transition-all duration-300"
+                    className="max-h-8 max-w-27.5 object-contain filter grayscale group-hover:grayscale-0 opacity-50 group-hover:opacity-90 transition-all duration-300"
                   />
                 ) : (
                   <span className="text-white/40 font-bold text-sm group-hover:text-white/70 transition-colors tracking-wide">
