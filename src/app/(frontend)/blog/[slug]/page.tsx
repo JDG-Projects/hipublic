@@ -9,20 +9,6 @@ import Image from 'next/image'
 
 export const revalidate = 3600
 
-export async function generateStaticParams() {
-  try {
-    const { getPayloadClient } = await import('@/lib/payload')
-    const payload = await getPayloadClient()
-    const res = await payload.find({
-      collection: 'posts',
-      limit: 100,
-      where: { status: { equals: 'published' } },
-    })
-    return res.docs.map((post) => ({ slug: (post as { slug: string }).slug }))
-  } catch {
-    return []
-  }
-}
 
 export default async function BlogPostPage({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params
