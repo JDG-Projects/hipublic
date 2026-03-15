@@ -8,6 +8,17 @@ import { getPayloadClient } from '@/lib/payload'
 
 export const revalidate = 86400
 
+export async function generateStaticParams() {
+  try {
+    const { getPayloadClient } = await import('@/lib/payload')
+    const payload = await getPayloadClient()
+    const res = await payload.find({ collection: 'services', limit: 50 })
+    return res.docs.map((s) => ({ slug: (s as { slug: string }).slug }))
+  } catch {
+    return []
+  }
+}
+
 export default async function ServiceDetailPage({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params
 

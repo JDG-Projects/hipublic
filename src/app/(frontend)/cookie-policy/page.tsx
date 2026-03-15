@@ -1,6 +1,8 @@
 import React from 'react'
 import { LegalPage } from '@/components/layout/LegalPage'
 
+export const revalidate = 86400
+
 export const metadata = {
   title: 'hiPublic | Cookie Policy',
   description: 'Learn how HiPublic uses cookies and tracking technologies on its website.',
