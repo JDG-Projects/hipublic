@@ -3,7 +3,7 @@ import Link from 'next/link'
 import { LoginForm } from '@/components/forms/LoginForm'
 
 export const metadata = {
-  title: 'Sign In — HiPublic',
+  title: 'hiPublic | Sign In',
 }
 
 export default function LoginPage() {

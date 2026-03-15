@@ -6,7 +6,7 @@ import { GradientText } from '@/components/ui/AnimatedText'
 import { getPayloadClient } from '@/lib/payload'
 
 export const metadata = {
-  title: 'Blog — HiPublic',
+  title: 'hiPublic | Blog',
   description: 'Insights, strategies, and trends in influencer marketing from the HiPublic team.',
 }
 

@@ -1,15 +1,16 @@
 import React from 'react'
 import Link from 'next/link'
 import { requireAuth } from '@/lib/auth'
-import { ArrowRight, Mail, User, Star } from 'lucide-react'
+import { ArrowRight, Mail, User, Star, LayoutDashboard } from 'lucide-react'
 
 export const metadata = {
-  title: 'Dashboard — HiPublic',
+  title: 'hiPublic | Dashboard',
 }
 
 export default async function DashboardPage() {
   const user = await requireAuth()
   const firstName = (user as { firstName?: string }).firstName ?? 'there'
+  const isAdmin = (user as { role?: string }).role === 'admin'
 
   const quickLinks = [
     { href: '/contact', icon: <Mail size={20} />, title: 'Start a Campaign', desc: 'Submit a new campaign request', color: 'from-purple-600/30 to-purple-500/10' },
@@ -25,6 +26,25 @@ export default async function DashboardPage() {
         </h1>
         <p className="text-white/50">Here&apos;s what&apos;s happening with your account.</p>
       </div>
+
+      {isAdmin && (
+        <Link href="/admin" className="group block mb-6">
+          <div className="p-5 rounded-2xl bg-linear-to-br from-purple-600/20 to-cyan-500/10 border border-purple-500/30 hover:border-purple-500/60 transition-all duration-200">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-3">
+                <div className="w-9 h-9 rounded-xl bg-purple-600/30 flex items-center justify-center text-purple-400">
+                  <LayoutDashboard size={18} />
+                </div>
+                <div>
+                  <p className="font-bold text-white text-sm">Admin Panel</p>
+                  <p className="text-white/40 text-xs">Manage content & users</p>
+                </div>
+              </div>
+              <ArrowRight size={16} className="text-purple-400/50 group-hover:text-purple-400 group-hover:translate-x-1 transition-all" />
+            </div>
+          </div>
+        </Link>
+      )}
 
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-10">
         {quickLinks.map((item) => (

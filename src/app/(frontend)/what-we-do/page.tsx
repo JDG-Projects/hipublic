@@ -4,7 +4,7 @@ import { ContactCTA } from '@/components/sections/ContactCTA'
 import { GradientText } from '@/components/ui/AnimatedText'
 
 export const metadata = {
-  title: 'About — HiPublic',
+  title: 'hiPublic | About',
   description:
     'Learn about HiPublic, the global influencer marketing agency connecting brands with creators worldwide.',
 }

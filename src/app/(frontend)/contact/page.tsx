@@ -5,7 +5,7 @@ import { SectionWrapper } from '@/components/ui/SectionWrapper'
 import { GradientText } from '@/components/ui/AnimatedText'
 
 export const metadata = {
-  title: 'Contact — HiPublic',
+  title: 'hiPublic | Contact',
   description: 'Get in touch with HiPublic. Whether you\'re a brand or influencer, we\'d love to hear from you.',
 }
 

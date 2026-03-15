@@ -3,7 +3,7 @@ import Link from 'next/link'
 import { RegisterForm } from '@/components/forms/RegisterForm'
 
 export const metadata = {
-  title: 'Create Account — HiPublic',
+  title: 'hiPublic | Create Account',
 }
 
 export default function RegisterPage() {

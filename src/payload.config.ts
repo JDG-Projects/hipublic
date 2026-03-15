@@ -19,6 +19,7 @@ const dirname = path.dirname(filename)
 export default buildConfig({
   admin: {
     user: Users.slug,
+    access: ({ req }) => req.user?.role === 'admin',
     importMap: {
       baseDir: path.resolve(dirname),
     },
@@ -35,6 +36,12 @@ export default buildConfig({
   },
   db: mongooseAdapter({
     url: process.env.DATABASE_URL || '',
+    connectOptions: {
+      maxPoolSize: 10,
+      minPoolSize: 2,
+      serverSelectionTimeoutMS: 5000,
+      socketTimeoutMS: 30000,
+    },
   }),
   sharp,
   plugins: [],
