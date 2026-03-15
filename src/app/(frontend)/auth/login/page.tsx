@@ -2,6 +2,8 @@ import React from 'react'
 import Link from 'next/link'
 import { LoginForm } from '@/components/forms/LoginForm'
 
+export const revalidate = 31536000
+
 export const metadata = {
   title: 'hiPublic | Sign In',
 }

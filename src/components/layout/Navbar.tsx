@@ -56,10 +56,10 @@ export function Navbar({ user }: NavbarProps) {
 
         {/* Navbar background */}
         <div
-          className={`absolute inset-0 transition-all duration-500 ${
+          className={`absolute inset-0 transition-all duration-500 border-b ${
             scrolled
-              ? 'bg-bg/80 backdrop-blur-2xl border-b border-white/6 shadow-2xl shadow-black/40'
-              : 'bg-transparent'
+              ? 'bg-[#07070f]/90 backdrop-blur-2xl border-white/6'
+              : 'bg-transparent border-transparent'
           }`}
         />
 
@@ -202,7 +202,7 @@ export function Navbar({ user }: NavbarProps) {
               className="fixed right-0 top-0 bottom-0 z-50 md:hidden w-80 flex flex-col"
             >
               {/* Drawer bg */}
-              <div className="absolute inset-0 bg-surface/95 backdrop-blur-2xl border-l border-white/7" />
+              <div className="absolute inset-0 bg-[#0d0d1a]/95 backdrop-blur-2xl border-l border-white/7" />
               {/* Top gradient accent */}
               <div className="absolute top-0 left-0 right-0 h-px bg-linear-to-r from-transparent via-purple-500/50 to-transparent" />
 

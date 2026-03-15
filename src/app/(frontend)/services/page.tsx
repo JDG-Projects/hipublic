@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { Suspense } from 'react'
 import Link from 'next/link'
 import { ArrowRight, Megaphone, BarChart3, Target, Users, Zap, Globe } from 'lucide-react'
 import { SectionWrapper } from '@/components/ui/SectionWrapper'
@@ -32,17 +32,59 @@ const fallback = [
   { id: '6', title: 'Global Reach', slug: 'global-reach', tagline: '50+ countries covered', icon: 'Globe', features: [{ feature: 'Multi-language campaigns' }, { feature: 'Local market expertise' }, { feature: 'Cross-border analytics' }] },
 ]
 
-export default async function ServicesPage() {
-  let services = fallback
+type Service = typeof fallback[number]
 
+function ServicesCards({ services }: { services: Service[] }) {
+  return (
+    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+      {services.map((service, i) => (
+        <SectionWrapper key={service.id} delay={i * 0.07}>
+          <GradientBorder>
+            <div className="p-8 flex flex-col gap-5 h-full">
+              <div className="w-14 h-14 rounded-xl bg-linear-to-br from-purple-600/30 to-cyan-500/20 flex items-center justify-center text-purple-400 border border-purple-500/20">
+                {iconMap[service.icon ?? 'Megaphone'] ?? <Megaphone size={28} />}
+              </div>
+              <div>
+                <h2 className="text-xl font-bold text-white mb-2">{service.title}</h2>
+                <p className="text-white/50 text-sm mb-4">{service.tagline}</p>
+                {service.features && service.features.length > 0 && (
+                  <ul className="flex flex-col gap-2">
+                    {service.features.map((f) => (
+                      <li key={f.feature} className="flex items-center gap-2 text-sm text-white/60">
+                        <span className="w-1.5 h-1.5 rounded-full bg-purple-400 flex-shrink-0" />
+                        {f.feature}
+                      </li>
+                    ))}
+                  </ul>
+                )}
+              </div>
+              <Link
+                href={`/services/${service.slug}`}
+                className="mt-auto flex items-center gap-2 text-sm text-purple-400 hover:text-purple-300 transition-colors group"
+              >
+                Learn more
+                <ArrowRight size={14} className="group-hover:translate-x-1 transition-transform" />
+              </Link>
+            </div>
+          </GradientBorder>
+        </SectionWrapper>
+      ))}
+    </div>
+  )
+}
+
+async function ServicesLoader() {
   try {
     const payload = await getPayloadClient()
     const res = await payload.find({ collection: 'services', limit: 20, sort: 'order' })
-    if (res.docs.length > 0) services = res.docs as typeof fallback
+    const services = res.docs.length > 0 ? (res.docs as Service[]) : fallback
+    return <ServicesCards services={services} />
   } catch {
-    // use fallback
+    return <ServicesCards services={fallback} />
   }
+}
 
+export default function ServicesPage() {
   return (
     <div className="pt-16">
       <section className="relative py-28 px-4 sm:px-6 lg:px-8 overflow-hidden">
@@ -66,40 +108,9 @@ export default async function ServicesPage() {
 
       <section className="py-16 px-4 sm:px-6 lg:px-8 pb-32">
         <div className="max-w-7xl mx-auto">
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {services.map((service, i) => (
-              <SectionWrapper key={service.id} delay={i * 0.07}>
-                <GradientBorder>
-                  <div className="p-8 flex flex-col gap-5 h-full">
-                    <div className="w-14 h-14 rounded-xl bg-linear-to-br from-purple-600/30 to-cyan-500/20 flex items-center justify-center text-purple-400 border border-purple-500/20">
-                      {iconMap[service.icon ?? 'Megaphone'] ?? <Megaphone size={28} />}
-                    </div>
-                    <div>
-                      <h2 className="text-xl font-bold text-white mb-2">{service.title}</h2>
-                      <p className="text-white/50 text-sm mb-4">{service.tagline}</p>
-                      {service.features && service.features.length > 0 && (
-                        <ul className="flex flex-col gap-2">
-                          {service.features.map((f) => (
-                            <li key={f.feature} className="flex items-center gap-2 text-sm text-white/60">
-                              <span className="w-1.5 h-1.5 rounded-full bg-purple-400 flex-shrink-0" />
-                              {f.feature}
-                            </li>
-                          ))}
-                        </ul>
-                      )}
-                    </div>
-                    <Link
-                      href={`/services/${service.slug}`}
-                      className="mt-auto flex items-center gap-2 text-sm text-purple-400 hover:text-purple-300 transition-colors group"
-                    >
-                      Learn more
-                      <ArrowRight size={14} className="group-hover:translate-x-1 transition-transform" />
-                    </Link>
-                  </div>
-                </GradientBorder>
-              </SectionWrapper>
-            ))}
-          </div>
+          <Suspense fallback={<ServicesCards services={fallback} />}>
+            <ServicesLoader />
+          </Suspense>
         </div>
       </section>
 

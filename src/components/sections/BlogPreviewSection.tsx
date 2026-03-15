@@ -6,6 +6,7 @@ import { motion } from 'framer-motion'
 import { ArrowRight, Calendar, Tag } from 'lucide-react'
 import { SectionWrapper } from '@/components/ui/SectionWrapper'
 import { Button } from '@/components/ui/Button'
+import Image from 'next/image'
 
 interface Post {
   id: string
@@ -26,7 +27,8 @@ const fallbackPosts: Post[] = [
     id: '1',
     title: 'iGaming Influencer Marketing Trends in 2025',
     slug: 'igaming-trends-2025',
-    excerpt: 'Discover the latest trends shaping influencer marketing in the iGaming industry and how to leverage them.',
+    excerpt:
+      'Discover the latest trends shaping influencer marketing in the iGaming industry and how to leverage them.',
     publishedAt: '2025-03-01',
     tags: [{ tag: 'iGaming' }, { tag: 'Trends' }],
   },
@@ -34,7 +36,8 @@ const fallbackPosts: Post[] = [
     id: '2',
     title: 'How to Choose the Right Influencer for Your Brand',
     slug: 'choose-right-influencer',
-    excerpt: 'A comprehensive guide to selecting influencers that align with your brand values and campaign goals.',
+    excerpt:
+      'A comprehensive guide to selecting influencers that align with your brand values and campaign goals.',
     publishedAt: '2025-02-15',
     tags: [{ tag: 'Strategy' }, { tag: 'Guide' }],
   },
@@ -42,7 +45,8 @@ const fallbackPosts: Post[] = [
     id: '3',
     title: 'Measuring ROI in Influencer Campaigns',
     slug: 'measuring-roi-influencer',
-    excerpt: 'Learn the key metrics and tools to accurately measure the return on investment from influencer partnerships.',
+    excerpt:
+      'Learn the key metrics and tools to accurately measure the return on investment from influencer partnerships.',
     publishedAt: '2025-02-01',
     tags: [{ tag: 'Analytics' }, { tag: 'ROI' }],
   },
@@ -84,7 +88,7 @@ export function BlogPreviewSection({ posts }: BlogPreviewSectionProps) {
                 >
                   {post.coverImage?.url ? (
                     <div className="aspect-video overflow-hidden">
-                      <img
+                      <Image
                         src={post.coverImage.url}
                         alt={post.title}
                         className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"

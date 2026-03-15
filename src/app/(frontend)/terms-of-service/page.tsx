@@ -1,6 +1,8 @@
 import React from 'react'
 import { LegalPage } from '@/components/layout/LegalPage'
 
+export const revalidate = 86400
+
 export const metadata = {
   title: 'hiPublic | Terms of Service',
   description: 'Read the terms and conditions governing your use of HiPublic services.',

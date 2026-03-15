@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { Suspense } from 'react'
 import { getPayloadClient } from '@/lib/payload'
 import { HeroSection } from '@/components/sections/HeroSection'
 import { ServicesGrid } from '@/components/sections/ServicesGrid'
@@ -9,46 +9,70 @@ import { ContactCTA } from '@/components/sections/ContactCTA'
 
 export const revalidate = 3600
 
-export default async function HomePage() {
-  let services: Parameters<typeof ServicesGrid>[0]['services'] = []
-  let posts: Parameters<typeof BlogPreviewSection>[0]['posts'] = []
-  let partners: Parameters<typeof PartnersMarquee>[0]['partners'] = []
-  let stats: Parameters<typeof StatsSection>[0]['stats'] = undefined
-
+async function StatsLoader() {
   try {
     const payload = await getPayloadClient()
-
-    const [servicesRes, postsRes, partnersRes, settingsRes] = await Promise.all([
-      payload.find({ collection: 'services', limit: 6, sort: 'order' }),
-      payload.find({
-        collection: 'posts',
-        limit: 3,
-        sort: '-publishedAt',
-        where: { status: { equals: 'published' } },
-      }),
-      payload.find({ collection: 'partners', limit: 20, sort: 'order' }),
-      payload.findGlobal({ slug: 'site-settings' }).catch(() => null),
-    ])
-
-    services = servicesRes.docs as Parameters<typeof ServicesGrid>[0]['services']
-    posts = postsRes.docs as Parameters<typeof BlogPreviewSection>[0]['posts']
-    partners = partnersRes.docs as Parameters<typeof PartnersMarquee>[0]['partners']
-
-    if (settingsRes) {
-      const s = settingsRes as { stats?: { value: string; label: string }[] }
-      stats = s.stats
-    }
+    const settings = await payload.findGlobal({ slug: 'site-settings' }).catch(() => null)
+    const stats = settings
+      ? (settings as { stats?: { value: string; label: string }[] }).stats
+      : undefined
+    return <StatsSection stats={stats} />
   } catch {
-    // DB not connected — use fallback data from components
+    return <StatsSection />
   }
+}
 
+async function PartnersLoader() {
+  try {
+    const payload = await getPayloadClient()
+    const res = await payload.find({ collection: 'partners', limit: 20, sort: 'order' })
+    return <PartnersMarquee partners={res.docs as Parameters<typeof PartnersMarquee>[0]['partners']} />
+  } catch {
+    return <PartnersMarquee />
+  }
+}
+
+async function ServicesLoader() {
+  try {
+    const payload = await getPayloadClient()
+    const res = await payload.find({ collection: 'services', limit: 6, sort: 'order' })
+    return <ServicesGrid services={res.docs as Parameters<typeof ServicesGrid>[0]['services']} />
+  } catch {
+    return <ServicesGrid services={[]} />
+  }
+}
+
+async function BlogLoader() {
+  try {
+    const payload = await getPayloadClient()
+    const res = await payload.find({
+      collection: 'posts',
+      limit: 3,
+      sort: '-publishedAt',
+      where: { status: { equals: 'published' } },
+    })
+    return <BlogPreviewSection posts={res.docs as Parameters<typeof BlogPreviewSection>[0]['posts']} />
+  } catch {
+    return <BlogPreviewSection />
+  }
+}
+
+export default function HomePage() {
   return (
     <>
       <HeroSection />
-      <StatsSection stats={stats} />
-      <PartnersMarquee partners={partners} />
-      <ServicesGrid services={services} />
-      <BlogPreviewSection posts={posts} />
+      <Suspense fallback={<StatsSection />}>
+        <StatsLoader />
+      </Suspense>
+      <Suspense fallback={<PartnersMarquee />}>
+        <PartnersLoader />
+      </Suspense>
+      <Suspense fallback={<ServicesGrid services={[]} />}>
+        <ServicesLoader />
+      </Suspense>
+      <Suspense fallback={<BlogPreviewSection />}>
+        <BlogLoader />
+      </Suspense>
       <ContactCTA />
     </>
   )
