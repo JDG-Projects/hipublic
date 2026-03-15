@@ -5,6 +5,7 @@ import { Calendar, Tag, ArrowLeft } from 'lucide-react'
 import { SectionWrapper } from '@/components/ui/SectionWrapper'
 import { ContactCTA } from '@/components/sections/ContactCTA'
 import { getPayloadClient } from '@/lib/payload'
+import Image from 'next/image'
 
 export const revalidate = 3600
 
@@ -50,7 +51,10 @@ export default async function BlogPostPage({ params }: { params: Promise<{ slug:
   return (
     <div className="pt-16">
       <article className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 py-24">
-        <Link href="/blog" className="inline-flex items-center gap-2 text-white/50 hover:text-white text-sm mb-8 transition-colors">
+        <Link
+          href="/blog"
+          className="inline-flex items-center gap-2 text-white/50 hover:text-white text-sm mb-8 transition-colors"
+        >
           <ArrowLeft size={16} /> Back to Blog
         </Link>
 
@@ -59,7 +63,9 @@ export default async function BlogPostPage({ params }: { params: Promise<{ slug:
             <div className="flex items-center gap-2 mb-4">
               <Tag size={14} className="text-purple-400" />
               {post.tags.map((t) => (
-                <span key={t.tag} className="text-sm text-purple-400 font-medium">{t.tag}</span>
+                <span key={t.tag} className="text-sm text-purple-400 font-medium">
+                  {t.tag}
+                </span>
               ))}
             </div>
           )}
@@ -69,13 +75,21 @@ export default async function BlogPostPage({ params }: { params: Promise<{ slug:
           {post.publishedAt && (
             <div className="flex items-center gap-2 text-sm text-white/40 mb-8 pb-8 border-b border-white/8">
               <Calendar size={14} />
-              {new Date(post.publishedAt).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })}
+              {new Date(post.publishedAt).toLocaleDateString('en-US', {
+                year: 'numeric',
+                month: 'long',
+                day: 'numeric',
+              })}
             </div>
           )}
 
           {post.coverImage?.url && (
             <div className="rounded-2xl overflow-hidden mb-10 aspect-video">
-              <img src={post.coverImage.url} alt={post.title} className="w-full h-full object-cover" />
+              <Image
+                src={post.coverImage.url}
+                alt={post.title}
+                className="w-full h-full object-cover"
+              />
             </div>
           )}
 

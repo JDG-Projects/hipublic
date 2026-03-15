@@ -10,7 +10,7 @@ interface AnimatedTextProps {
   once?: boolean
 }
 
-export function AnimatedText({ text, className = '', delay = 0, once = true }: AnimatedTextProps) {
+export function AnimatedText({ text, className = '', delay = 0 }: AnimatedTextProps) {
   const words = text.split(' ')
 
   return (
