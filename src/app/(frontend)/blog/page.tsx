@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { Suspense } from 'react'
 import Link from 'next/link'
 import { Calendar, Tag } from 'lucide-react'
 import { SectionWrapper } from '@/components/ui/SectionWrapper'
@@ -80,9 +80,63 @@ const fallback: Post[] = [
   },
 ]
 
-export default async function BlogPage() {
-  let posts: Post[] = fallback
+function PostsGrid({ posts }: { posts: Post[] }) {
+  return (
+    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+      {posts.map((post, i) => (
+        <SectionWrapper key={post.id} delay={i * 0.06}>
+          <Link href={`/blog/${post.slug}`} className="group block h-full">
+            <article className="h-full rounded-2xl bg-white/3 border border-white/8 hover:border-purple-500/30 overflow-hidden transition-colors duration-300">
+              {post.coverImage?.url ? (
+                <div className="aspect-video overflow-hidden">
+                  <Image
+                    src={post.coverImage.url}
+                    alt={post.title}
+                    width={640}
+                    height={360}
+                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                  />
+                </div>
+              ) : (
+                <div className="aspect-video bg-linear-to-br from-purple-900/30 to-cyan-900/20 flex items-center justify-center">
+                  <div className="text-4xl font-black text-white/10">HP</div>
+                </div>
+              )}
+              <div className="p-6">
+                {post.tags && post.tags.length > 0 && (
+                  <div className="flex items-center gap-2 mb-3">
+                    <Tag size={12} className="text-purple-400" />
+                    {post.tags.slice(0, 2).map((t) => (
+                      <span key={t.tag} className="text-xs text-purple-400 font-medium">
+                        {t.tag}
+                      </span>
+                    ))}
+                  </div>
+                )}
+                <h2 className="font-bold text-white group-hover:text-purple-300 transition-colors mb-2 line-clamp-2">
+                  {post.title}
+                </h2>
+                <p className="text-white/50 text-sm line-clamp-3 mb-4">{post.excerpt}</p>
+                {post.publishedAt && (
+                  <div className="flex items-center gap-1.5 text-xs text-white/30">
+                    <Calendar size={12} />
+                    {new Date(post.publishedAt).toLocaleDateString('en-US', {
+                      year: 'numeric',
+                      month: 'long',
+                      day: 'numeric',
+                    })}
+                  </div>
+                )}
+              </div>
+            </article>
+          </Link>
+        </SectionWrapper>
+      ))}
+    </div>
+  )
+}
 
+async function PostsLoader() {
   try {
     const payload = await getPayloadClient()
     const res = await payload.find({
@@ -91,11 +145,14 @@ export default async function BlogPage() {
       sort: '-publishedAt',
       where: { status: { equals: 'published' } },
     })
-    if (res.docs.length > 0) posts = res.docs as Post[]
+    const posts = res.docs.length > 0 ? (res.docs as Post[]) : fallback
+    return <PostsGrid posts={posts} />
   } catch {
-    // use fallback
+    return <PostsGrid posts={fallback} />
   }
+}
 
+export default function BlogPage() {
   return (
     <div className="pt-16">
       <section className="relative py-28 px-4 sm:px-6 lg:px-8 overflow-hidden">
@@ -117,55 +174,9 @@ export default async function BlogPage() {
 
       <section className="py-8 px-4 sm:px-6 lg:px-8 pb-32">
         <div className="max-w-7xl mx-auto">
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {posts.map((post, i) => (
-              <SectionWrapper key={post.id} delay={i * 0.06}>
-                <Link href={`/blog/${post.slug}`} className="group block h-full">
-                  <article className="h-full rounded-2xl bg-white/3 border border-white/8 hover:border-purple-500/30 overflow-hidden transition-colors duration-300">
-                    {post.coverImage?.url ? (
-                      <div className="aspect-video overflow-hidden">
-                        <Image
-                          src={post.coverImage.url}
-                          alt={post.title}
-                          className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
-                        />
-                      </div>
-                    ) : (
-                      <div className="aspect-video bg-linear-to-br from-purple-900/30 to-cyan-900/20 flex items-center justify-center">
-                        <div className="text-4xl font-black text-white/10">HP</div>
-                      </div>
-                    )}
-                    <div className="p-6">
-                      {post.tags && post.tags.length > 0 && (
-                        <div className="flex items-center gap-2 mb-3">
-                          <Tag size={12} className="text-purple-400" />
-                          {post.tags.slice(0, 2).map((t) => (
-                            <span key={t.tag} className="text-xs text-purple-400 font-medium">
-                              {t.tag}
-                            </span>
-                          ))}
-                        </div>
-                      )}
-                      <h2 className="font-bold text-white group-hover:text-purple-300 transition-colors mb-2 line-clamp-2">
-                        {post.title}
-                      </h2>
-                      <p className="text-white/50 text-sm line-clamp-3 mb-4">{post.excerpt}</p>
-                      {post.publishedAt && (
-                        <div className="flex items-center gap-1.5 text-xs text-white/30">
-                          <Calendar size={12} />
-                          {new Date(post.publishedAt).toLocaleDateString('en-US', {
-                            year: 'numeric',
-                            month: 'long',
-                            day: 'numeric',
-                          })}
-                        </div>
-                      )}
-                    </div>
-                  </article>
-                </Link>
-              </SectionWrapper>
-            ))}
-          </div>
+          <Suspense fallback={<PostsGrid posts={fallback} />}>
+            <PostsLoader />
+          </Suspense>
         </div>
       </section>
     </div>
