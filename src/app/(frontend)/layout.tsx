@@ -53,7 +53,12 @@ async function NavbarServer() {
 
 async function FooterServer() {
   const settings = await getCachedSiteSettings()
-  return <Footer socialLinks={settings?.socialLinks} />
+  const footerPages = settings?.footerLinks
+    ?.filter((page): page is { title: string; slug: string } =>
+      typeof page === 'object' && page !== null && 'title' in page && 'slug' in page,
+    )
+    ?.slice(0, 4)
+  return <Footer socialLinks={settings?.socialLinks} footerPages={footerPages} />
 }
 
 function NavbarFallback() {

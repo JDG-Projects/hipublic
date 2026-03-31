@@ -2,6 +2,11 @@ import React from 'react'
 import Link from 'next/link'
 import { Instagram, Linkedin, Twitter, Send, Youtube } from 'lucide-react'
 
+interface FooterPage {
+  title: string
+  slug: string
+}
+
 interface FooterProps {
   socialLinks?: {
     instagram?: string
@@ -10,6 +15,7 @@ interface FooterProps {
     telegram?: string
     youtube?: string
   }
+  footerPages?: FooterPage[]
 }
 
 const footerLinks = {
@@ -32,7 +38,7 @@ const footerLinks = {
   ],
 }
 
-export function Footer({ socialLinks }: FooterProps) {
+export function Footer({ socialLinks, footerPages }: FooterProps) {
   return (
     <footer className="border-t border-white/5 bg-bg">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
@@ -150,6 +156,27 @@ export function Footer({ socialLinks }: FooterProps) {
               </ul>
             </div>
           ))}
+
+          {/* CMS Pages */}
+          {footerPages && footerPages.length > 0 && (
+            <div>
+              <h3 className="text-white font-semibold text-sm mb-4 tracking-wider uppercase">
+                Pages
+              </h3>
+              <ul className="flex flex-col gap-2.5">
+                {footerPages.map((page) => (
+                  <li key={page.slug}>
+                    <Link
+                      href={`/${page.slug}`}
+                      className="text-white/50 hover:text-white text-sm transition-colors duration-200"
+                    >
+                      {page.title}
+                    </Link>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          )}
         </div>
 
         <div className="border-t border-white/5 mt-12 pt-8 flex flex-col sm:flex-row items-center justify-between gap-4">

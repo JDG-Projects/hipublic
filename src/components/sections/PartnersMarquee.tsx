@@ -50,6 +50,8 @@ export function PartnersMarquee({ partners }: PartnersMarqueeProps) {
                     src={partner.logo.url}
                     alt={partner.name}
                     className="max-h-8 max-w-27.5 object-contain filter grayscale group-hover:grayscale-0 opacity-50 group-hover:opacity-90 transition-all duration-300"
+                    width={32}
+                    height={32}
                   />
                 ) : (
                   <span className="text-white/40 font-bold text-sm group-hover:text-white/70 transition-colors tracking-wide">

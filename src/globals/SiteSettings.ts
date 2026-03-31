@@ -21,6 +21,16 @@ export const SiteSettings: GlobalConfig = {
       ],
     },
     {
+      name: 'footerLinks',
+      type: 'relationship',
+      relationTo: 'pages',
+      hasMany: true,
+      maxRows: 4,
+      admin: {
+        description: 'Select up to 4 pages to display in the footer',
+      },
+    },
+    {
       name: 'stats',
       type: 'array',
       fields: [
