@@ -12,6 +12,7 @@ import { Posts } from './collections/Posts'
 import { Services } from './collections/Services'
 import { Partners } from './collections/Partners'
 import { ContactSubmissions } from './collections/ContactSubmissions'
+import { Pages } from './collections/Pages'
 import { SiteSettings } from './globals/SiteSettings'
 
 const filename = fileURLToPath(import.meta.url)
@@ -27,7 +28,7 @@ export default buildConfig({
       titleSuffix: '— HiPublic CMS',
     },
   },
-  collections: [Users, Media, Posts, Services, Partners, ContactSubmissions],
+  collections: [Users, Media, Posts, Services, Partners, ContactSubmissions, Pages],
   globals: [SiteSettings],
   editor: lexicalEditor(),
   secret: process.env.PAYLOAD_SECRET || '',
@@ -49,7 +50,7 @@ export default buildConfig({
       enabled: Boolean(process.env.BLOB_READ_WRITE_TOKEN),
       token: process.env.BLOB_READ_WRITE_TOKEN ?? '',
       collections: {
-        media: true,
+        media: { prefix: 'media' },
       },
     }),
   ],

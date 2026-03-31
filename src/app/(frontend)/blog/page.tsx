@@ -1,6 +1,6 @@
 import React, { Suspense } from 'react'
 import Link from 'next/link'
-import { Calendar, Tag } from 'lucide-react'
+import { Calendar, Tag, ChevronLeft, ChevronRight } from 'lucide-react'
 import { SectionWrapper } from '@/components/ui/SectionWrapper'
 import { GradientText } from '@/components/ui/AnimatedText'
 import { getPayloadClient } from '@/lib/payload'
@@ -13,6 +13,8 @@ export const metadata = {
 
 export const revalidate = 600
 
+const POSTS_PER_PAGE = 6
+
 interface Post {
   id: string
   title: string
@@ -22,63 +24,6 @@ interface Post {
   tags?: { tag: string }[]
   coverImage?: { url?: string }
 }
-
-const fallback: Post[] = [
-  {
-    id: '1',
-    title: 'iGaming Influencer Marketing Trends in 2025',
-    slug: 'igaming-trends-2025',
-    excerpt:
-      'Discover the latest trends shaping influencer marketing in the iGaming industry and how to leverage them for maximum ROI.',
-    publishedAt: '2025-03-01',
-    tags: [{ tag: 'iGaming' }, { tag: 'Trends' }],
-  },
-  {
-    id: '2',
-    title: 'How to Choose the Right Influencer for Your Brand',
-    slug: 'choose-right-influencer',
-    excerpt:
-      'A comprehensive guide to selecting influencers that align with your brand values and campaign goals.',
-    publishedAt: '2025-02-15',
-    tags: [{ tag: 'Strategy' }, { tag: 'Guide' }],
-  },
-  {
-    id: '3',
-    title: 'Measuring ROI in Influencer Campaigns',
-    slug: 'measuring-roi-influencer',
-    excerpt:
-      'Learn the key metrics and tools to accurately measure the return on investment from influencer partnerships.',
-    publishedAt: '2025-02-01',
-    tags: [{ tag: 'Analytics' }, { tag: 'ROI' }],
-  },
-  {
-    id: '4',
-    title: 'LinkedIn B2B Influencer Marketing Guide',
-    slug: 'linkedin-b2b-guide',
-    excerpt:
-      'How to harness the power of LinkedIn influencers for B2B brand awareness and lead generation.',
-    publishedAt: '2025-01-20',
-    tags: [{ tag: 'B2B' }, { tag: 'LinkedIn' }],
-  },
-  {
-    id: '5',
-    title: 'Influencer Contracts: What You Need to Know',
-    slug: 'influencer-contracts',
-    excerpt:
-      'Essential legal considerations and best practices for influencer partnership agreements.',
-    publishedAt: '2025-01-10',
-    tags: [{ tag: 'Legal' }, { tag: 'Contracts' }],
-  },
-  {
-    id: '6',
-    title: 'Crisis Management for Influencer Campaigns',
-    slug: 'crisis-management',
-    excerpt:
-      'How to handle PR crises in influencer marketing campaigns and protect your brand reputation.',
-    publishedAt: '2024-12-20',
-    tags: [{ tag: 'PR' }, { tag: 'Strategy' }],
-  },
-]
 
 function PostsGrid({ posts }: { posts: Post[] }) {
   return (
@@ -136,23 +81,109 @@ function PostsGrid({ posts }: { posts: Post[] }) {
   )
 }
 
-async function PostsLoader() {
+function Pagination({
+  currentPage,
+  totalPages,
+}: {
+  currentPage: number
+  totalPages: number
+}) {
+  if (totalPages <= 1) return null
+
+  const pages: (number | '...')[] = []
+  for (let i = 1; i <= totalPages; i++) {
+    if (i === 1 || i === totalPages || (i >= currentPage - 1 && i <= currentPage + 1)) {
+      pages.push(i)
+    } else if (pages[pages.length - 1] !== '...') {
+      pages.push('...')
+    }
+  }
+
+  return (
+    <nav className="flex items-center justify-center gap-2 mt-16">
+      {currentPage > 1 ? (
+        <Link
+          href={currentPage === 2 ? '/blog' : `/blog?page=${currentPage - 1}`}
+          className="flex items-center justify-center w-10 h-10 rounded-xl bg-white/5 border border-white/8 text-white/50 hover:bg-purple-600/20 hover:text-purple-400 hover:border-purple-500/40 transition-all duration-200"
+        >
+          <ChevronLeft size={18} />
+        </Link>
+      ) : (
+        <div className="w-10 h-10 rounded-xl bg-white/3 border border-white/5 flex items-center justify-center text-white/20">
+          <ChevronLeft size={18} />
+        </div>
+      )}
+
+      {pages.map((page, i) =>
+        page === '...' ? (
+          <span key={`dots-${i}`} className="w-10 h-10 flex items-center justify-center text-white/30">
+            ...
+          </span>
+        ) : (
+          <Link
+            key={page}
+            href={page === 1 ? '/blog' : `/blog?page=${page}`}
+            className={`flex items-center justify-center w-10 h-10 rounded-xl border text-sm font-medium transition-all duration-200 ${
+              page === currentPage
+                ? 'bg-purple-600/20 border-purple-500/40 text-purple-400'
+                : 'bg-white/5 border-white/8 text-white/50 hover:bg-purple-600/20 hover:text-purple-400 hover:border-purple-500/40'
+            }`}
+          >
+            {page}
+          </Link>
+        ),
+      )}
+
+      {currentPage < totalPages ? (
+        <Link
+          href={`/blog?page=${currentPage + 1}`}
+          className="flex items-center justify-center w-10 h-10 rounded-xl bg-white/5 border border-white/8 text-white/50 hover:bg-purple-600/20 hover:text-purple-400 hover:border-purple-500/40 transition-all duration-200"
+        >
+          <ChevronRight size={18} />
+        </Link>
+      ) : (
+        <div className="w-10 h-10 rounded-xl bg-white/3 border border-white/5 flex items-center justify-center text-white/20">
+          <ChevronRight size={18} />
+        </div>
+      )}
+    </nav>
+  )
+}
+
+async function PostsLoader({ page }: { page: number }) {
   try {
     const payload = await getPayloadClient()
     const res = await payload.find({
       collection: 'posts',
-      limit: 20,
+      limit: POSTS_PER_PAGE,
+      page,
       sort: '-publishedAt',
       where: { status: { equals: 'published' } },
     })
-    const posts = res.docs.length > 0 ? (res.docs as Post[]) : fallback
-    return <PostsGrid posts={posts} />
+
+    if (res.docs.length === 0) {
+      return <p className="text-center text-white/40">No posts found.</p>
+    }
+
+    return (
+      <>
+        <PostsGrid posts={res.docs as Post[]} />
+        <Pagination currentPage={page} totalPages={res.totalPages} />
+      </>
+    )
   } catch {
-    return <PostsGrid posts={fallback} />
+    return <p className="text-center text-white/40">Failed to load posts.</p>
   }
 }
 
-export default function BlogPage() {
+export default async function BlogPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ page?: string }>
+}) {
+  const { page: pageParam } = await searchParams
+  const page = Math.max(1, Number(pageParam) || 1)
+
   return (
     <div className="pt-16">
       <section className="relative py-28 px-4 sm:px-6 lg:px-8 overflow-hidden">
@@ -174,8 +205,26 @@ export default function BlogPage() {
 
       <section className="py-8 px-4 sm:px-6 lg:px-8 pb-32">
         <div className="max-w-7xl mx-auto">
-          <Suspense fallback={<PostsGrid posts={fallback} />}>
-            <PostsLoader />
+          <Suspense
+            fallback={
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                {Array.from({ length: POSTS_PER_PAGE }).map((_, i) => (
+                  <div
+                    key={i}
+                    className="rounded-2xl bg-white/3 border border-white/8 overflow-hidden animate-pulse"
+                  >
+                    <div className="aspect-video bg-white/5" />
+                    <div className="p-6 space-y-3">
+                      <div className="h-4 bg-white/5 rounded w-1/3" />
+                      <div className="h-5 bg-white/5 rounded w-3/4" />
+                      <div className="h-4 bg-white/5 rounded w-full" />
+                    </div>
+                  </div>
+                ))}
+              </div>
+            }
+          >
+            <PostsLoader page={page} />
           </Suspense>
         </div>
       </section>
