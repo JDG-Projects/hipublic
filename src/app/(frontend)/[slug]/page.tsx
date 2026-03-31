@@ -29,7 +29,7 @@ export default async function DynamicPage({ params }: { params: Promise<{ slug: 
         <article className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 py-24">
           <SectionWrapper>
             <h1 className="text-4xl sm:text-5xl font-black mb-10 leading-tight">{page.title}</h1>
-            <div className="prose prose-invert prose-lg max-w-none">
+            <div className="prose prose-invert prose-lg max-w-none prose-headings:text-white prose-headings:font-bold prose-p:text-white/70 prose-strong:text-white prose-li:text-white/70 prose-a:text-purple-400 hover:prose-a:text-purple-300">
               <RichText data={page.content as SerializedEditorState} />
             </div>
           </SectionWrapper>
