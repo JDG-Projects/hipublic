@@ -5,6 +5,8 @@ import { Calendar, Tag, ArrowLeft } from 'lucide-react'
 import { SectionWrapper } from '@/components/ui/SectionWrapper'
 import { ContactCTA } from '@/components/sections/ContactCTA'
 import { getPayloadClient } from '@/lib/payload'
+import { RichText } from '@payloadcms/richtext-lexical/react'
+import type { SerializedEditorState } from '@payloadcms/richtext-lexical/lexical'
 import Image from 'next/image'
 
 export const revalidate = 3600
@@ -96,9 +98,12 @@ export default async function BlogPostPage({ params }: { params: Promise<{ slug:
             </div>
           )}
 
-          <div className="prose prose-invert prose-lg max-w-none">
-            <p className="text-white/60 text-lg leading-relaxed">{post.excerpt}</p>
-            <p className="text-white/40 mt-8">Full article content managed via Payload CMS.</p>
+          <div className="prose prose-invert prose-lg max-w-none prose-headings:text-white prose-headings:font-bold prose-p:text-white/70 prose-strong:text-white prose-li:text-white/70 prose-a:text-purple-400 hover:prose-a:text-purple-300 prose-blockquote:border-purple-500/40 prose-blockquote:text-white/50">
+            {post.content ? (
+              <RichText data={post.content as SerializedEditorState} />
+            ) : (
+              <p className="text-white/60 text-lg leading-relaxed">{post.excerpt}</p>
+            )}
           </div>
         </SectionWrapper>
       </article>

@@ -25,6 +25,7 @@
     "@payloadcms/storage-vercel-blob": "3.79.0",
     "@payloadcms/ui": "3.79.0",
     "@tailwindcss/postcss": "^4.2.1",
+    "@tailwindcss/typography": "^0.5.19",
     "@vercel/blob": "^2.3.2",
     "cross-env": "^7.0.3",
     "dotenv": "16.4.7",
